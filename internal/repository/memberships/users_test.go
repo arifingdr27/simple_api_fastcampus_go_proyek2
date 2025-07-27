@@ -1,6 +1,7 @@
 package memberships
 
 import (
+	"regexp"
 	"testing"
 	"time"
 
@@ -152,6 +153,28 @@ func Test_repository_GetUser(t *testing.T) {
 					WillReturnRows(rows)
 			},
 		},
+		{
+			name: "Get User By ID Success",
+			args: args{
+				id:       1,
+				email:    "",
+				username: "",
+			},
+			want: &memberships.User{
+				Email:        "test@example.com",
+				Username:     "test_user",
+				PasswordHash: "password",
+				CreatedBy:    "test@example.com",
+				UpdatedBy:    "test@example.com",
+			},
+			mockfn: func(args args) {
+				rows := sqlmock.NewRows([]string{"id", "email", "username", "password_hash", "created_by", "updated_by", "created_at", "updated_at", "deleted_at"}).
+					AddRow(1, "test@example.com", "test_user", "password", "test@example.com", "test@example.com", time.Now(), time.Now(), nil)
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (email = $1 OR username = $2 OR id = $3) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT $4`)).
+					WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+					WillReturnRows(rows)
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -194,4 +217,55 @@ func Test_repository_GetUser(t *testing.T) {
 			assert.NoError(t, err)
 		})
 	}
+}
+
+func TestPribadiGetUser(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	gormdb, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected database connection", err)
+	}
+
+	repo := NewRepository(gormdb)
+
+	t.Run("berhasil ambil data", func(t *testing.T) {
+		rows := sqlmock.NewRows([]string{"id", "email", "username", "password_hash", "created_by", "updated_by", "created_at", "updated_at", "deleted_at"}).
+			AddRow(1, "test@example.com", "test_user", "password", "test@example.com", "test@example.com", time.Now(), time.Now(), nil)
+
+		// Set expected query with exact parameters - sesuaikan dengan query GORM yang sebenarnya
+		mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (email = $1 OR username = $2 OR id = $3) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT $4`)).
+			WithArgs("test@example.com", "test_user", 1, 1).
+			WillReturnRows(rows)
+
+		user, err := repo.GetUser("test@example.com", "test_user", 1)
+		// Add proper assertions
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+			return // Return early jika error untuk menghindari panic
+		}
+
+		// Cek user tidak nil sebelum mengakses field-nya
+		if user == nil {
+			t.Errorf("expected user, got nil")
+			return
+		}
+
+		t.Logf("Test Args: email=%s, username=%s, id=%d", user.Email, user.Username, user.ID)
+
+		if user.ID != 1 || user.Email != "test@example.com" || user.Username != "test_user" {
+			t.Errorf("incorrect user returned: %+v", user)
+		}
+
+		// Verify all expectations were met
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unfulfilled expectations: %v", err)
+		}
+	})
 }
