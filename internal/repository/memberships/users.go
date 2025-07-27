@@ -10,7 +10,7 @@ func (r *repository) CreateUser(user *memberships.User) error {
 	if user == nil {
 		return errors.New("user already exists")
 	}
-	if err := r.db.Create(user).Error; err != nil {
+	if err := r.db.Create(&user).Error; err != nil {
 		return err
 	}
 	return nil
