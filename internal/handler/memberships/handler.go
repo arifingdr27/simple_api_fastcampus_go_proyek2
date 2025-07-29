@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//go:generate mockgen -source=handler.go -destination=handler_mock_test.go -package=memberships
 type service interface {
 	SignUp(request memberships.SignUpRequest) error
 }
@@ -24,5 +25,5 @@ func NewHandler(api *gin.Engine, s service) *Handler {
 
 func (h *Handler) RegisterRoutes() {
 	membership := h.Group("/memberships")
-	membership.POST("/memberships/signup", h.SignUp)
+	membership.POST("/signup", h.SignUp)
 }
