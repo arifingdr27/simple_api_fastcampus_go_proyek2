@@ -4,3 +4,7 @@ service:
 
 database:
   dataSourceName: "host=localhost user=user password=password dbname=mydatabase port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+
+spotifyClient:
+  clientId: "abe878520cd2447297172b2f32413442"
+  clientSecret: "df7694c213a348e7a38d9f2adad9e651"
