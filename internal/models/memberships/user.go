@@ -16,3 +16,12 @@ type SignUpRequest struct {
 	Username string `json:"username" binding:"required,min=3,max=30"`
 	Password string `json:"password" binding:"required,min=8,max=100"`
 }
+
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8,max=100"`
+}
+
+type LoginResponse struct {
+	AccessToken string `json:"access_token"`
+}

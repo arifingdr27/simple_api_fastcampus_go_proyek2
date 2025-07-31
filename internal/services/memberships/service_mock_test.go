@@ -10,9 +10,8 @@
 package memberships
 
 import (
-	reflect "reflect"
-
 	memberships "proyek3-catalog-music/internal/models/memberships"
+	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
 )
