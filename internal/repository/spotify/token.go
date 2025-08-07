@@ -49,7 +49,7 @@ func (o *Outbound) generateToken() error {
 	var spotifyResponse SpotifyResponse
 	err = json.NewDecoder(response.Body).Decode(&spotifyResponse)
 	if err != nil {
-		log.Error().Err(err).Msg("error decode parsing response api spotify")
+		log.Error().Err(err).Msg("error decode parsing response api spotify2")
 		return err
 	}
 	o.accessToken = spotifyResponse.AccessToken

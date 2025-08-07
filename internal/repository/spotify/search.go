@@ -16,17 +16,17 @@ type SpotifySearchResponse struct {
 }
 
 type TrackSearchSpotify struct {
-	Href     string             `json:"href"`
+	Href     *string            `json:"href"`
 	Limit    int                `json:"limit"`
 	Offset   int                `json:"offset"`
-	Next     string             `json:"next"`
-	Previous string             `json:"previous"`
+	Next     *string            `json:"next"`
+	Previous *string            `json:"previous"`
 	Total    int                `json:"total"`
 	Items    []SpotifyItemTrack `json:"items"`
 }
 
 type SpotifyItemTrack struct {
-	Albums   SpotifyAlbumObject     `json:"albums"`
+	Albums   SpotifyAlbumObject     `json:"album"`
 	Artists  []SpotifyArtistsObject `json:"artists"`
 	Explicit bool                   `json:"explicit"`
 	Href     string                 `json:"href"`
@@ -58,6 +58,7 @@ func (o *Outbound) Search(ctx context.Context, query string, limit, offset int) 
 	urlparams := "https://api.spotify.com/v1/search"
 	params := url.Values{}
 	params.Set("q", query)
+	params.Set("market", "ID")
 	params.Set("type", "track")
 	params.Set("limit", strconv.Itoa(limit))
 	params.Set("offset", strconv.Itoa(offset))
