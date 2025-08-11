@@ -1,0 +1,20 @@
+package repository
+
+import (
+	"context"
+
+	"ewallet-ums/internal/models"
+
+	"gorm.io/gorm"
+)
+
+type RegisterRepository struct {
+	DB *gorm.DB
+}
+
+func (r *RegisterRepository) InsertNewUser(ctx context.Context, user models.User) error {
+	if err := r.DB.Create(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}

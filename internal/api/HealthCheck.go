@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"Ewallet-grpc/helpers"
-	"Ewallet-grpc/internal/interfaces"
+	"ewallet-ums/helpers"
+	"ewallet-ums/internal/interfaces"
 
 	"github.com/gin-gonic/gin"
 )
