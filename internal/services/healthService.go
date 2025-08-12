@@ -1,10 +1,6 @@
 package services
 
-import "ewallet-ums/internal/interfaces"
-
-type HealthCheck struct {
-	HealthCheckRepository interfaces.IHealthCheckRepo
-}
+type HealthCheck struct{}
 
 func (s *HealthCheck) HealthCheckServices() (string, error) {
 	return "testing data health", nil

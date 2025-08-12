@@ -10,29 +10,55 @@ import (
 )
 
 func ServeHTTP() {
-	healthCheckSvc := services.HealthCheck{}
-	healthCheckApi := api.HealthCheck{
-		HealthCheckServices: &healthCheckSvc,
-	}
+	depedency := depedencyInject()
 
 	r := gin.Default()
 
-	r.GET("/ping", healthCheckApi.HealthCheckHandlerHttp)
+	r.GET("/ping", depedency.HealthCheckAPI.HealthCheckHandlerHttp)
 
-	registerRepository := &repository.RegisterRepository{
-		DB: helpers.DB,
-	}
-	registerService := &services.RegisterService{
-		RegisterRepo: registerRepository,
-	}
-	registerController := &api.Regsiter{
-		RegisterService: registerService,
-	}
 	userv1 := r.Group("/user/v1")
-	userv1.POST("/register", registerController.RegisterHandler)
+	userv1.POST("/register", depedency.RegisterAPI.RegisterHandler)
+	userv1.POST("/login", depedency.LoginApi.LoginHandlerHttp)
 
 	port := helpers.GetEnv("APP_PORT", "")
 	if err := r.Run(":" + port); err != nil {
 		panic(err)
+	}
+}
+
+type Depedency struct {
+	HealthCheckAPI api.HealthCheck
+	RegisterAPI    api.Regsiter
+	LoginApi       api.LoginHandler
+}
+
+func depedencyInject() Depedency {
+	healthCheckService := services.HealthCheck{}
+	healthCheckAPI := api.HealthCheck{
+		HealthCheckServices: &healthCheckService,
+	}
+
+	repository := &repository.UserRepository{
+		DB: helpers.DB,
+	}
+	registerSvc := services.RegisterService{
+		UserRepo: repository,
+	}
+	registerAPI := api.Regsiter{
+		RegisterService: &registerSvc,
+	}
+
+	loginSvc := services.LoginService{
+		UserRepo: repository,
+	}
+
+	LoginApi := api.LoginHandler{
+		LoginService: &loginSvc,
+	}
+
+	return Depedency{
+		RegisterAPI:    registerAPI,
+		LoginApi:       LoginApi,
+		HealthCheckAPI: healthCheckAPI,
 	}
 }

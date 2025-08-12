@@ -11,7 +11,7 @@ import (
 )
 
 type RegisterService struct {
-	RegisterRepo interfaces.IRegisterRepository
+	UserRepo interfaces.IUserRepository
 }
 
 func (rs RegisterService) Register(ctx context.Context, register models.User) (interface{}, error) {
@@ -22,7 +22,7 @@ func (rs RegisterService) Register(ctx context.Context, register models.User) (i
 	register.Password = string(hashPassword)
 	register.CreatedAt = time.Now()
 	register.UpdatedAt = time.Now()
-	if err := rs.RegisterRepo.InsertNewUser(ctx, register); err != nil {
+	if err := rs.UserRepo.InsertNewUser(ctx, register); err != nil {
 		return nil, err
 	}
 	return register, nil

@@ -30,7 +30,7 @@ func (user User) Validate() error {
 
 type UserSession struct {
 	ID                  int       `gorm:"primaryKey"`
-	UserID              string    `json:"user_id" gorm:"column:user_id;type:int" validate:"required"`
+	UserID              int       `json:"user_id" gorm:"column:user_id;type:int" validate:"required"`
 	Token               string    `json:"token" gorm:"column:token;type:varchar(255)" validate:"required"`
 	RefreshToken        string    `json:"refresh_token" gorm:"column:refresh_token;type:varchar(255)" validate:"required"`
 	TokenExpired        time.Time `json:"-" validate:"required"`
