@@ -12,6 +12,8 @@ type IUserRepository interface {
 	InsertNewUserSession(ctx context.Context, userSession models.UserSession) error
 	DeleteUserSession(ctx context.Context, token string) error
 	GetUserSessionByToken(ctx context.Context, token string) (*models.UserSession, error)
+	UpdateTokenByRefreshToken(ctx context.Context, token string, refresh_token string) error
+	GetUserSessionByRefreshToken(ctx context.Context, refreshToken string) (*models.UserSession, error)
 }
 
 type IUserService interface {

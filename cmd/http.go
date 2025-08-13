@@ -17,10 +17,13 @@ func ServeHTTP() {
 
 	r.GET("/ping", depedency.HealthCheckApi.HealthCheckHandlerHttp)
 
-	userv1 := r.Group("/user/v1")
-	userv1.POST("/register", depedency.RegisterApi.RegisterHandler)
-	userv1.POST("/login", depedency.LoginApi.LoginHandlerHttp)
-	userv1.DELETE("/logout", depedency.LogoutApi.LogoutHandler)
+	userV1 := r.Group("/user/v1")
+	userV1.POST("/register", depedency.RegisterApi.RegisterHandler)
+	userV1.POST("/login", depedency.LoginApi.LoginHandlerHttp)
+
+	userV1WithAuth := userV1.Use()
+	userV1WithAuth.DELETE("/logout", depedency.MiddlewareValidateAuth, depedency.LogoutApi.LogoutHandler)
+	userV1WithAuth.PUT("/refresh_token", depedency.MiddlewareRefreshToken, depedency.RefreshToken.RefreshToken)
 
 	port := helpers.GetEnv("APP_PORT", "")
 	if err := r.Run(":" + port); err != nil {
@@ -35,6 +38,7 @@ type Depedency struct {
 	RegisterApi    interfaces.IRegisterHandler
 	LoginApi       interfaces.ILoginHandler
 	LogoutApi      interfaces.ILogoutHandler
+	RefreshToken   interfaces.IRefreshTokenHandler
 }
 
 func depedencyInject() *Depedency {
@@ -69,10 +73,20 @@ func depedencyInject() *Depedency {
 		LogoutService: &LogoutService,
 	}
 
+	RefreshTokenService := services.RefreshTokenService{
+		UserRepo: repository,
+	}
+
+	RefreshTokenApi := api.RefreshTokenHandler{
+		RefreshTokenService: &RefreshTokenService,
+	}
+
 	return &Depedency{
 		RegisterApi:    &registerAPI,
 		LoginApi:       &LoginApi,
 		HealthCheckApi: &healthCheckAPI,
 		LogoutApi:      &LogoutApi,
+		RefreshToken:   &RefreshTokenApi,
+		UserRepository: repository,
 	}
 }

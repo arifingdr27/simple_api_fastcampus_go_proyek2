@@ -38,9 +38,24 @@ func (r *UserRepository) DeleteUserSession(ctx context.Context, token string) er
 	return r.DB.Exec("DELETE FROM user_session WHERE token = ?", token).Error
 }
 
+func (r *UserRepository) UpdateTokenByRefreshToken(ctx context.Context, token string, refresh_token string) error {
+	return r.DB.Exec("UPDATE user_session SET token = ? WHERE refresh_token = ?", token, refresh_token).Error
+}
+
 func (r *UserRepository) GetUserSessionByToken(ctx context.Context, token string) (*models.UserSession, error) {
 	var session *models.UserSession
 	if err := r.DB.Where("token = ?", token).First(&session).Error; err != nil {
+		return nil, err
+	}
+	if session.ID == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return session, nil
+}
+
+func (r *UserRepository) GetUserSessionByRefreshToken(ctx context.Context, refreshToken string) (*models.UserSession, error) {
+	var session *models.UserSession
+	if err := r.DB.Where("refresh_token = ?", refreshToken).First(&session).Error; err != nil {
 		return nil, err
 	}
 	if session.ID == 0 {

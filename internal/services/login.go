@@ -25,12 +25,12 @@ func (s *LoginService) Login(ctx context.Context, req models.LoginRequest) (mode
 		return models.LoginResponse{}, err
 	}
 
-	token, err := helpers.GenerateToken(ctx, int64(user.ID), user.Username, user.FullName, "jwt", time.Now())
+	token, err := helpers.GenerateToken(ctx, int64(user.ID), user.Email, user.Username, user.FullName, "jwt", time.Now())
 	if err != nil {
 		return models.LoginResponse{}, err
 	}
 
-	refreshToken, err := helpers.GenerateToken(ctx, int64(user.ID), user.Username, user.FullName, "refresh_token", time.Now())
+	refreshToken, err := helpers.GenerateToken(ctx, int64(user.ID), user.Email, user.Username, user.FullName, "refresh_token", time.Now())
 	if err != nil {
 		return models.LoginResponse{}, err
 	}
