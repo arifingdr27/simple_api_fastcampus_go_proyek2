@@ -12,7 +12,7 @@ import (
 )
 
 type LoginHandler struct {
-	LoginService interfaces.IloginService
+	LoginService interfaces.ILoginService
 }
 
 func (api LoginHandler) LoginHandlerHttp(c *gin.Context) {

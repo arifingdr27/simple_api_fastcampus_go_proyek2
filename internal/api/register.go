@@ -11,11 +11,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Regsiter struct {
+type Register struct {
 	RegisterService interfaces.IUserService
 }
 
-func (api *Regsiter) RegisterHandler(c *gin.Context) {
+func (api *Register) RegisterHandler(c *gin.Context) {
 	log := helpers.Logger
 
 	req := models.User{}

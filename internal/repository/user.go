@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"ewallet-ums/internal/models"
 
@@ -23,12 +22,8 @@ func (r *UserRepository) InsertNewUser(ctx context.Context, user models.User) er
 func (r *UserRepository) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	var user *models.User
 	if err := r.DB.Where("username = ?", username).First(&user).Error; err != nil {
-		fmt.Println("err")
-		fmt.Println(err)
 		return nil, err
 	}
-	fmt.Println("121")
-	fmt.Println(user)
 	if user.ID == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
@@ -37,4 +32,19 @@ func (r *UserRepository) GetUserByUsername(ctx context.Context, username string)
 
 func (r *UserRepository) InsertNewUserSession(ctx context.Context, session models.UserSession) error {
 	return r.DB.Create(&session).Error
+}
+
+func (r *UserRepository) DeleteUserSession(ctx context.Context, token string) error {
+	return r.DB.Exec("DELETE FROM user_session WHERE token = ?", token).Error
+}
+
+func (r *UserRepository) GetUserSessionByToken(ctx context.Context, token string) (*models.UserSession, error) {
+	var session *models.UserSession
+	if err := r.DB.Where("token = ?", token).First(&session).Error; err != nil {
+		return nil, err
+	}
+	if session.ID == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return session, nil
 }

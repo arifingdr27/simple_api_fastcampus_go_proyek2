@@ -4,10 +4,16 @@ import (
 	"context"
 
 	"ewallet-ums/internal/models"
+
+	"github.com/gin-gonic/gin"
 )
 
-type IloginRepository interface{}
+type ILoginRepository interface{}
 
-type IloginService interface {
+type ILoginService interface {
 	Login(ctx context.Context, req models.LoginRequest) (models.LoginResponse, error)
+}
+
+type ILoginHandler interface {
+	LoginHandlerHttp(c *gin.Context)
 }
