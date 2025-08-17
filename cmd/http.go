@@ -34,11 +34,12 @@ func ServeHTTP() {
 type Depedency struct {
 	UserRepository interfaces.IUserRepository
 
-	HealthCheckApi interfaces.IHealthCheckHandler
-	RegisterApi    interfaces.IRegisterHandler
-	LoginApi       interfaces.ILoginHandler
-	LogoutApi      interfaces.ILogoutHandler
-	RefreshToken   interfaces.IRefreshTokenHandler
+	HealthCheckApi  interfaces.IHealthCheckHandler
+	RegisterApi     interfaces.IRegisterHandler
+	LoginApi        interfaces.ILoginHandler
+	LogoutApi       interfaces.ILogoutHandler
+	RefreshToken    interfaces.IRefreshTokenHandler
+	TokenValidation *api.TokenValidationHandler
 }
 
 func depedencyInject() *Depedency {
@@ -81,12 +82,21 @@ func depedencyInject() *Depedency {
 		RefreshTokenService: &RefreshTokenService,
 	}
 
+	tokenValidationService := services.TokenValidationService{
+		UserRepo: repository,
+	}
+
+	tokenValidationApi := api.TokenValidationHandler{
+		TokenValidationService: &tokenValidationService,
+	}
+
 	return &Depedency{
-		RegisterApi:    &registerAPI,
-		LoginApi:       &LoginApi,
-		HealthCheckApi: &healthCheckAPI,
-		LogoutApi:      &LogoutApi,
-		RefreshToken:   &RefreshTokenApi,
-		UserRepository: repository,
+		RegisterApi:     &registerAPI,
+		LoginApi:        &LoginApi,
+		HealthCheckApi:  &healthCheckAPI,
+		LogoutApi:       &LogoutApi,
+		RefreshToken:    &RefreshTokenApi,
+		UserRepository:  repository,
+		TokenValidation: &tokenValidationApi,
 	}
 }

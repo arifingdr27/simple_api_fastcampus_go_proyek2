@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -36,6 +37,9 @@ func (d *Depedency) MiddlewareValidateAuth(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Println(time.Now().Unix())
+	fmt.Println("time.Now().Unix()")
+	fmt.Println(claim.ExpiresAt.Unix())
 	if time.Now().Unix() > claim.ExpiresAt.Unix() {
 		log.Println("jwt token is expired: ", claim.ExpiresAt)
 		helpers.SendResponseHttp(ctx, http.StatusUnauthorized, "unauthorized", nil)
