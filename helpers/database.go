@@ -6,6 +6,8 @@ import (
 
 	"ewallet-ums/internal/models"
 
+	// "ewallet-ums/internal/models"
+
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -24,5 +26,5 @@ func SetupMySql() {
 
 	logrus.Info("successfully connect to database")
 
-	DB.AutoMigrate(&models.User{}, &models.UserSession{})
+	DB.AutoMigrate(&models.Wallet{}, &models.WalletTransaction{})
 }

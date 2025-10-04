@@ -17,13 +17,8 @@ func ServeHTTP() {
 
 	r.GET("/ping", depedency.HealthCheckApi.HealthCheckHandlerHttp)
 
-	userV1 := r.Group("/user/v1")
-	userV1.POST("/register", depedency.RegisterApi.RegisterHandler)
-	userV1.POST("/login", depedency.LoginApi.LoginHandlerHttp)
-
-	userV1WithAuth := userV1.Use()
-	userV1WithAuth.DELETE("/logout", depedency.MiddlewareValidateAuth, depedency.LogoutApi.LogoutHandler)
-	userV1WithAuth.PUT("/refresh_token", depedency.MiddlewareRefreshToken, depedency.RefreshToken.RefreshToken)
+	ewalletv1 := r.Group("wallet/v1")
+	ewalletv1.POST("/", depedency.WalletAPI.Create)
 
 	port := helpers.GetEnv("APP_PORT", "")
 	if err := r.Run(":" + port); err != nil {
@@ -32,14 +27,8 @@ func ServeHTTP() {
 }
 
 type Depedency struct {
-	UserRepository interfaces.IUserRepository
-
-	HealthCheckApi  interfaces.IHealthCheckHandler
-	RegisterApi     interfaces.IRegisterHandler
-	LoginApi        interfaces.ILoginHandler
-	LogoutApi       interfaces.ILogoutHandler
-	RefreshToken    interfaces.IRefreshTokenHandler
-	TokenValidation *api.TokenValidationHandler
+	HealthCheckApi interfaces.IHealthCheckHandler
+	WalletAPI      interfaces.IWalletAPI
 }
 
 func depedencyInject() *Depedency {
@@ -47,56 +36,19 @@ func depedencyInject() *Depedency {
 	healthCheckAPI := api.HealthCheck{
 		HealthCheckServices: healthCheckService,
 	}
-
-	repository := &repository.UserRepository{
+	walletRepo := &repository.WalletRepo{
 		DB: helpers.DB,
 	}
-	registerSvc := services.RegisterService{
-		UserRepo: repository,
-	}
-	registerAPI := api.Register{
-		RegisterService: &registerSvc,
-	}
 
-	loginSvc := services.LoginService{
-		UserRepo: repository,
+	walletSvc := &services.WalletService{
+		WalletRepo: walletRepo,
 	}
-
-	LoginApi := api.LoginHandler{
-		LoginService: &loginSvc,
-	}
-
-	LogoutService := services.LogoutService{
-		UserRepo: repository,
-	}
-
-	LogoutApi := api.LogoutHandler{
-		LogoutService: &LogoutService,
-	}
-
-	RefreshTokenService := services.RefreshTokenService{
-		UserRepo: repository,
-	}
-
-	RefreshTokenApi := api.RefreshTokenHandler{
-		RefreshTokenService: &RefreshTokenService,
-	}
-
-	tokenValidationService := services.TokenValidationService{
-		UserRepo: repository,
-	}
-
-	tokenValidationApi := api.TokenValidationHandler{
-		TokenValidationService: &tokenValidationService,
+	walletAPI := &api.WalletAPI{
+		WalletService: walletSvc,
 	}
 
 	return &Depedency{
-		RegisterApi:     &registerAPI,
-		LoginApi:        &LoginApi,
-		HealthCheckApi:  &healthCheckAPI,
-		LogoutApi:       &LogoutApi,
-		RefreshToken:    &RefreshTokenApi,
-		UserRepository:  repository,
-		TokenValidation: &tokenValidationApi,
+		HealthCheckApi: &healthCheckAPI,
+		WalletAPI:      walletAPI,
 	}
 }

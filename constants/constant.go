@@ -2,6 +2,7 @@ package constants
 
 const (
 	ErrFailedParseRequest = "Data tidak sesuai"
-	ErrServerError        = "Terjadi kesalahan pada server"
-	SuccessMessage        = "Success"
+	SuccessMessage        = "success"
+	ErrFailedBadRequest   = "data tidak sesuai"
+	ErrServerError        = "terjadi kesalahan pada server"
 )
